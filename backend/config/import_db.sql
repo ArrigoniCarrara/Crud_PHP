@@ -1,11 +1,11 @@
 -- Adminer 4.8.1 MySQL 5.5.5-10.3.39-MariaDB-0+deb10u2 dump
 SET NAMES utf8;
-SET time_zone = '+00:00';
+SET time_time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 DROP DATABASE IF EXISTS `students_db_3`;
-CREATE DATABASE `students_db_3` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
+CREATE DATABASE `students_db_3`;
 USE `students_db_3`;
 
 /*Crear usuario de la base de datos*/
@@ -38,8 +38,8 @@ CREATE TABLE `students_subjects` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `student_id` (`student_id`,`subject_id`),
   KEY `subject_id` (`subject_id`),
-  CONSTRAINT `students_subjects_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `students_subjects_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE
+  CONSTRAINT `students_subjects_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`), -- ON DELETE CASCADE elimnado
+  CONSTRAINT `students_subjects_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) -- ON DELETE CASCADE eliminado
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `students_subjects` (`id`, `student_id`, `subject_id`, `approved`) VALUES
@@ -59,5 +59,3 @@ INSERT INTO `subjects` (`id`, `name`) VALUES
 (4,	'Fundamentos de Informática'),
 (1,	'Tecnologías A'),
 (2,	'Tecnologías B');
-
--- 2025-05-28 00:09:08

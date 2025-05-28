@@ -1,7 +1,7 @@
-/*****************TODA ESTA PRIMER PARTE SE DEBE EJECUTAR COMO ROOT************/
+/*TODA ESTA PRIMER PARTE SE DEBE EJECUTAR COMO ROOT*/
 /*Crear la base de datos*/
 CREATE DATABASE IF NOT EXISTS students_db_3
-CHARACTER SET utf8 
+CHARACTER SET utf8
 COLLATE utf8_unicode_ci;
 
 /*Crear usuario de la base de datos*/
@@ -12,11 +12,8 @@ GRANT ALL PRIVILEGES ON students_db_3.* TO 'students_user_3'@'localhost';
 
 /*Aplicar los cambios en los permisos​*/
 FLUSH PRIVILEGES;​
-/******************************************************************************/
 
-/*************A PARTIR DE ACÁ SE PUEDE HACER COMO ROOT 
-O PARA MAYOR SEGURIDAD CON EL USUARIO students_user_3****************************/
-/*Usar la base de datos​ o ingresar en el Adminer o PHPMyAdmin a la base de datos*/
+/*A PARTIR DE ACÁ SE PUEDE HACER COMO ROOT O PARA MAYOR SEGURIDAD CON EL USUARIO students_user_3*/
 USE students_db_3;
 
 /*Crear la tabla students*/
@@ -40,34 +37,25 @@ CREATE TABLE subjects (
 ) ENGINE=INNODB;
 
 /*Insertar materias de prueba*/
-INSERT INTO subjects (name) VALUES 
-('Tecnologías A'), 
-('Tecnologías B'), 
-('Algoritmos y Estructura de Datos I'), 
+INSERT INTO subjects (name) VALUES
+('Tecnologías A'),
+('Tecnologías B'),
+('Algoritmos y Estructura de Datos I'),
 ('Fundamentos de Informática');
 
-/*Crear TABLA INTERMEDIA students_subjects
-Constraints, o restricción UNIQUE(student_id, subject_id): garantiza que un estudiante
-no tenga dos veces la misma materia*/
-/*approved: si está aprobada la materia o no (por defecto FALSE).
-ON DELETE CASCADE: si eliminás un estudiante o materia, se borra
-su asignación automáticamente.*/
+/*
+ON DELETE CASCADE: elimiando, ahora la validación se hará a nivel de código PHP.*/
 CREATE TABLE students_subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
     subject_id INT NOT NULL,
     approved BOOLEAN DEFAULT FALSE,
     UNIQUE (student_id, subject_id),
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+    FOREIGN KEY (student_id) REFERENCES students(id), -- ON DELETE CASCADE eliminado
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) -- ON DELETE CASCADE eliminado
 ) ENGINE=INNODB;
 
 /*Insertar relaciones de prueba students_subjects*/
 INSERT INTO students_subjects (student_id, subject_id, approved) VALUES
 (1, 1, 1),
 (2, 2, 0);
-
-/*VOLVER TODO A CERO, BORRAR BASE DE DATOS Y USUARIO (SE DEBERÍA EJECUTAR COMO ROOT)*/
-/*REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'students_user_3'@'localhost';
-DROP USER 'students_user_3'@'localhost';
-DROP DATABASE students_db_3;*/

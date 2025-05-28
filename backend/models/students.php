@@ -18,6 +18,18 @@ function getStudentById($conn, $id)
     return $result->fetch_assoc(); 
 }
 
+// EJ 3a) Refactoring Nro3: nueva funcion que verifica si un estudiante esta involucrado en alguna relacion students_subjects
+function isStudentInvolvedInSubjects($conn, $student_id)
+{
+    $sql = "SELECT COUNT(*) FROM students_subjects WHERE student_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_row();
+    return $row[0] > 0; // Retorna true si hay relaciones
+}
+
 function createStudent($conn, $fullname, $email, $age) 
 {
     $sql = "INSERT INTO students (fullname, email, age) VALUES (?, ?, ?)";

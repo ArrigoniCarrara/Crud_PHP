@@ -1,15 +1,16 @@
 <?php
 require_once("./models/students.php");
+require_once("./models/studentsSubjects.php"); 
 
-function handleGet($conn) 
+function handleGet($conn)
 {
     $input = json_decode(file_get_contents("php://input"), true);
-    
-    if (isset($input['id'])) 
+
+    if (isset($input['id']))
     {
         $student = getStudentById($conn, $input['id']);
         echo json_encode($student);
-    } 
+    }
     else
     {
         $students = getAllStudents($conn);
@@ -17,48 +18,63 @@ function handleGet($conn)
     }
 }
 
-function handlePost($conn) 
+function handlePost($conn)
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
     $result = createStudent($conn, $input['fullname'], $input['email'], $input['age']);
-    if ($result['inserted'] > 0) 
+    if ($result['inserted'] > 0)
     {
         echo json_encode(["message" => "Estudiante agregado correctamente"]);
-    } 
-    else 
+    }
+    else
     {
         http_response_code(500);
         echo json_encode(["error" => "No se pudo agregar"]);
     }
 }
 
-function handlePut($conn) 
+function handlePut($conn)
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
     $result = updateStudent($conn, $input['id'], $input['fullname'], $input['email'], $input['age']);
-    if ($result['updated'] > 0) 
+    if ($result['updated'] > 0)
     {
         echo json_encode(["message" => "Actualizado correctamente"]);
-    } 
-    else 
+    }
+    else
     {
         http_response_code(500);
         echo json_encode(["error" => "No se pudo actualizar"]);
     }
 }
 
-function handleDelete($conn) 
+function handleDelete($conn)
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
-    $result = deleteStudent($conn, $input['id']);
-    if ($result['deleted'] > 0) 
+    if (!isset($input['id'])) {
+        http_response_code(400);
+        echo json_encode(["error" => "El ID del estudiante es requerido para eliminar."]);
+        return;
+    }
+
+    $student_id = $input['id'];
+
+    // No permitir eliminar si el estudiante tiene relaciones en students_subjects
+    if (isStudentInvolvedInSubjects($conn, $student_id)) { // Uso de la nueva función
+        http_response_code(409); 
+        echo json_encode(["error" => "No se puede eliminar el estudiante porque está asignado a una o más materias."]);
+        return;
+    }
+
+    $result = deleteStudent($conn, $student_id);
+    if ($result['deleted'] > 0)
     {
-        echo json_encode(["message" => "Eliminado correctamente"]);
-    } 
-    else 
+        echo json_encode(["message" => "Estudiante eliminado correctamente"]);
+    }
+    else
     {
         http_response_code(500);
         echo json_encode(["error" => "No se pudo eliminar"]);

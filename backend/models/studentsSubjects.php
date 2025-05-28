@@ -1,20 +1,32 @@
 <?php
-function assignSubjectToStudent($conn, $student_id, $subject_id, $approved) 
+function assignSubjectToStudent($conn, $student_id, $subject_id, $approved)
 {
     $sql = "INSERT INTO students_subjects (student_id, subject_id, approved) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("iii", $student_id, $subject_id, $approved);
     $stmt->execute();
 
-    return 
+    return
     [
-        'inserted' => $stmt->affected_rows,        
+        'inserted' => $stmt->affected_rows,
         'id' => $conn->insert_id
     ];
 }
 
-//Query escrita sin ALIAS resumidos (a mi me gusta más):
-function getAllSubjectsStudents($conn) 
+// EJ 3b) de refactoring Nro 3  verifica si una relación estudiante-materia ya existe
+function checkStudentSubjectExists($conn, $student_id, $subject_id)
+{
+    $sql = "SELECT id FROM students_subjects WHERE student_id = ? AND subject_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $student_id, $subject_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc(); // Retorna la fila si existe
+}
+
+
+//Query escrita sin ALIAS resumidos:
+function getAllSubjectsStudents($conn)
 {
     $sql = "SELECT students_subjects.id,
                 students_subjects.student_id,
@@ -30,7 +42,7 @@ function getAllSubjectsStudents($conn)
 }
 
 //Query escrita con ALIAS resumidos:
-function getSubjectsByStudent($conn, $student_id) 
+function getSubjectsByStudent($conn, $student_id)
 {
     $sql = "SELECT ss.subject_id, s.name, ss.approved
         FROM students_subjects ss
@@ -41,14 +53,14 @@ function getSubjectsByStudent($conn, $student_id)
     $stmt->execute();
     $result= $stmt->get_result();
 
-    return $result->fetch_all(MYSQLI_ASSOC); 
+    return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-function updateStudentSubject($conn, $id, $student_id, $subject_id, $approved) 
+function updateStudentSubject($conn, $id, $student_id, $subject_id, $approved)
 {
-    $sql = "UPDATE students_subjects 
-            SET student_id = ?, subject_id = ?, approved = ? 
-            WHERE id = ?";
+    $sql = "UPDATE students_subjects
+             SET student_id = ?, subject_id = ?, approved = ?
+             WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("iiii", $student_id, $subject_id, $approved, $id);
     $stmt->execute();
@@ -56,7 +68,7 @@ function updateStudentSubject($conn, $id, $student_id, $subject_id, $approved)
     return ['updated' => $stmt->affected_rows];
 }
 
-function removeStudentSubject($conn, $id) 
+function removeStudentSubject($conn, $id)
 {
     $sql = "DELETE FROM students_subjects WHERE id = ?";
     $stmt = $conn->prepare($sql);
